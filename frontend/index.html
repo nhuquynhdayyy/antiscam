@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AntiScam – Người thứ hai tỉnh táo</title>
+<style>
+  :root {
+    --bg:#f6f7f9; --card:#fff; --text:#1c2430; --muted:#667085; --border:#e2e6ec;
+    --safe:#1a7f4b; --safe-bg:#e6f5ec; --warn:#b26a00; --warn-bg:#fff3dc;
+    --danger:#c0262d; --danger-bg:#fde8e9; --accent:#2557d6; --mark:#ffe58a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#12161c; --card:#1b212a; --text:#e8ecf2; --muted:#9aa5b5; --border:#2c3441;
+      --safe:#58d08c; --safe-bg:#143325; --warn:#f0b24d; --warn-bg:#3a2b10;
+      --danger:#ff7a80; --danger-bg:#3d1a1c; --accent:#7aa2ff; --mark:#6b5a12;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+         background:var(--bg); color:var(--text); line-height:1.5; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:16px; }
+  textarea { width:100%; min-height:130px; resize:vertical; padding:12px; font:inherit; color:inherit;
+             background:transparent; border:1px solid var(--border); border-radius:10px; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+  button { font:inherit; cursor:pointer; border-radius:10px; border:1px solid var(--border);
+           background:transparent; color:inherit; padding:8px 14px; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+  button:disabled { opacity:.6; cursor:wait; }
+  .samples button { font-size:.85rem; padding:5px 10px; color:var(--muted); }
+  .badge { display:inline-block; padding:4px 12px; border-radius:999px; font-weight:700; }
+  .badge.safe { background:var(--safe-bg); color:var(--safe); }
+  .badge.suspicious { background:var(--warn-bg); color:var(--warn); }
+  .badge.danger { background:var(--danger-bg); color:var(--danger); }
+  .advice { border-left:4px solid var(--accent); padding:8px 12px; margin:12px 0; background:var(--bg); border-radius:6px; }
+  .quote { white-space:pre-wrap; word-break:break-word; padding:10px 12px; border:1px dashed var(--border); border-radius:10px; }
+  mark { background:var(--mark); color:inherit; border-radius:3px; padding:0 2px; }
+  .chips span { display:inline-block; margin:2px 6px 2px 0; padding:2px 10px; border:1px solid var(--border);
+                border-radius:999px; font-size:.85rem; color:var(--muted); }
+  h3 { margin:16px 0 6px; font-size:1rem; }
+  ul { margin:4px 0; padding-left:20px; }
+  .err { color:var(--danger); }
+  .hidden { display:none; }
+  .meta { color:var(--muted); font-size:.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>🛡️ AntiScam</h1>
+  <p class="sub">Dán tin nhắn, link hoặc tình huống đáng ngờ. AntiScam giúp bạn kiểm tra trước khi hành động.</p>
+
+  <section class="card">
+    <textarea id="input" placeholder="Dán nội dung đáng ngờ vào đây…"></textarea>
+    <div class="row">
+      <button id="btn" class="primary">Kiểm tra</button>
+      <span id="status" class="meta"></span>
+    </div>
+    <div class="row samples" id="samples"><span class="meta">Mẫu thử:</span></div>
+  </section>
+
+  <section id="result" class="card hidden"></section>
+  <p class="meta">Chỉ để tham khảo. AntiScam không tự chuyển tiền hay liên hệ ai thay bạn.</p>
+</main>
+
+<script>
+// ---------- Cấu hình ----------
+// Đổi địa chỉ API qua ?api=https://...run.app  (mặc định chạy local). ?mock=1 để dựng giao diện không cần backend.
+const params = new URLSearchParams(location.search);
+const API_BASE = (params.get("api") || "http://localhost:8080").replace(/\/$/, "");
+const MOCK = params.get("mock") === "1";
+
+const RISK_LABEL = { safe: "An toàn", suspicious: "Đáng ngờ", danger: "Nguy hiểm" };
+const STAGE_LABEL = { none: "Chưa rõ", approach: "Tiếp cận", threat: "Đe dọa", isolation: "Cô lập",
+                      urgency: "Khẩn cấp", action_request: "Yêu cầu hành động" };
+const TACTIC_LABEL = { authority: "Giả danh quyền lực", fear: "Gây sợ hãi", urgency: "Tạo khẩn cấp",
+                       secrecy: "Yêu cầu giữ bí mật", reward: "Hứa thưởng", trust_building: "Tạo lòng tin",
+                       scarcity: "Khan hiếm" };
+const SAMPLES = {
+  "Việc làm đặt cọc": "Bên mình tuyển cộng tác viên online lương 500k-1tr/ngày. Để nhận việc bạn đặt cọc 500k, hoàn lại sau ca đầu. Chốt trong 30 phút nữa nhé, hết suất.",
+  "Link giả ngân hàng": "[Vietcombank] Tài khoản của quý khách bị khóa do chưa cập nhật sinh trắc học. Vui lòng xác thực tại http://vcb-xacthuc.top/login trước 18h hôm nay.",
+  "Tin an toàn": "Tối nay 7h đi ăn mì Quảng ở Hải Châu nhé, mình đặt bàn rồi."
+};
+
+const $ = (id) => document.getElementById(id);
+
+// ---------- Gọi API ----------
+async function analyze(text) {
+  if (MOCK) return mockResult(text);
+  const res = await fetch(API_BASE + "/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
+  if (!res.ok) throw new Error("Máy chủ trả về lỗi " + res.status);
+  return res.json();
+}
+
+function mockResult(text) {
+  const evidence = ["đặt cọc 500k", "Chốt trong 30 phút"].filter((e) => text.includes(e));
+  return new Promise((r) => setTimeout(() => r({
+    risk_level: evidence.length ? "danger" : "safe",
+    scam_type: "fake_job_deposit", stage: "action_request", tactics: ["reward", "urgency"],
+    evidence, entities: { phones: [], urls: [], accounts: [], organizations: [] },
+    next_likely_step: "Yêu cầu chuyển thêm phí",
+    user_advice: "Dừng lại, không chuyển tiền. Công ty thật không thu cọc để nhận việc.",
+    ask_trusted_circle: true, follow_up_question: "", rule_reasons: [], decided_by: "ai"
+  }), 600));
+}
+
+// ---------- Hiển thị ----------
+function el(tag, props = {}, ...children) {
+  const n = document.createElement(tag);
+  Object.assign(n, props);
+  for (const c of children) n.append(c);
+  return n;
+}
+
+// Tô sáng bằng chứng bằng DOM (không dùng innerHTML để tránh chèn mã độc từ tin nhắn)
+function highlight(text, evidence) {
+  const ranges = [];
+  for (const ev of evidence || []) {
+    if (!ev) continue;
+    const i = text.indexOf(ev);
+    if (i >= 0) ranges.push([i, i + ev.length]);
+  }
+  ranges.sort((a, b) => a[0] - b[0]);
+  const merged = [];
+  for (const r of ranges) {
+    const last = merged[merged.length - 1];
+    if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else merged.push([...r]);
+  }
+  const box = el("div", { className: "quote" });
+  let pos = 0;
+  for (const [s, e] of merged) {
+    box.append(text.slice(pos, s), el("mark", { textContent: text.slice(s, e) }));
+    pos = e;
+  }
+  box.append(text.slice(pos));
+  return box;
+}
+
+function listSection(title, items) {
+  if (!items || !items.length) return null;
+  return el("div", {}, el("h3", { textContent: title }),
+            el("ul", {}, ...items.map((x) => el("li", { textContent: x }))));
+}
+
+function render(text, d) {
+  const box = $("result");
+  box.replaceChildren();
+  box.classList.remove("hidden");
+
+  // Backend khung (stub) chưa có Analyst: hiển thị kết quả luật để vẫn thấy được luồng chạy
+  if (d.stub) {
+    const ent = d.entities || {};
+    d = { risk_level: ent.rule_level === "none" ? "safe" : ent.rule_level, stage: "none", tactics: [],
+          evidence: [], entities: ent, user_advice: "(Bản khung) Mới có kết quả từ luật kiểm tra, chưa có phân tích AI.",
+          rule_reasons: ent.rule_reasons || [], follow_up_question: "" };
+  }
+
+  const risk = d.risk_level || "suspicious";
+  box.append(el("span", { className: "badge " + risk, textContent: RISK_LABEL[risk] || risk }));
+  if (d.stage && d.stage !== "none")
+    box.append(el("span", { className: "meta", textContent: "  Giai đoạn: " + (STAGE_LABEL[d.stage] || d.stage) }));
+
+  if (d.user_advice) box.append(el("div", { className: "advice", textContent: d.user_advice }));
+
+  box.append(el("h3", { textContent: "Nội dung bạn gửi (cụm đáng ngờ được tô sáng)" }), highlight(text, d.evidence));
+
+  if (d.tactics && d.tactics.length) {
+    const chips = el("div", { className: "chips" }, ...d.tactics.map((t) => el("span", { textContent: TACTIC_LABEL[t] || t })));
+    box.append(el("h3", { textContent: "Chiêu thao túng" }), chips);
+  }
+  const rs = listSection("Lý do từ luật kiểm tra", d.rule_reasons); if (rs) box.append(rs);
+
+  const e = d.entities || {};
+  const ents = [].concat((e.urls || []).map((x) => "Link: " + x), (e.phones || []).map((x) => "SĐT: " + x),
+                         (e.accounts || []).map((x) => "Tài khoản: " + x), (e.organizations || []).map((x) => "Giả mạo: " + x));
+  const es = listSection("Thông tin trích xuất", ents); if (es) box.append(es);
+
+  if (d.next_likely_step) box.append(el("p", { className: "meta", textContent: "Bước tiếp theo có thể xảy ra: " + d.next_likely_step }));
+  if (d.follow_up_question) box.append(el("p", { textContent: "❓ " + d.follow_up_question }));
+  if (d.ask_trusted_circle) box.append(el("p", { textContent: "👥 Nên hỏi ý kiến một người bạn tin cậy trước khi làm gì tiếp." }));
+}
+
+// ---------- Sự kiện ----------
+async function run() {
+  const text = $("input").value.trim();
+  if (!text) { $("status").textContent = "Hãy dán nội dung cần kiểm tra."; return; }
+  $("btn").disabled = true; $("status").textContent = "Đang phân tích…"; $("status").className = "meta";
+  try {
+    render(text, await analyze(text));
+    $("status").textContent = "";
+  } catch (err) {
+    $("status").textContent = "Không kết nối được: " + err.message + ". Hệ thống đang bận, thử lại sau.";
+    $("status").className = "err";
+  } finally {
+    $("btn").disabled = false;
+  }
+}
+
+$("btn").addEventListener("click", run);
+$("input").addEventListener("keydown", (ev) => { if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) run(); });
+for (const [name, txt] of Object.entries(SAMPLES)) {
+  $("samples").append(el("button", { textContent: name, onclick: () => { $("input").value = txt; } }));
+}
+</script>
+</body>
+</html>
