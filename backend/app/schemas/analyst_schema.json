@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "properties": {
+    "risk_level": { "type": "string", "enum": ["safe", "suspicious", "danger"] },
+    "scam_type": {
+      "type": "string",
+      "enum": ["none", "fake_job_deposit", "fake_police_bank", "investment_crypto", "romance", "online_shopping", "fake_receipt", "phishing_link", "fake_booking", "other"]
+    },
+    "stage": {
+      "type": "string",
+      "enum": ["none", "approach", "threat", "isolation", "urgency", "action_request"]
+    },
+    "tactics": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["authority", "fear", "urgency", "secrecy", "reward", "trust_building", "scarcity"] }
+    },
+    "evidence": { "type": "array", "items": { "type": "string" } },
+    "entities": {
+      "type": "object",
+      "properties": {
+        "phones": { "type": "array", "items": { "type": "string" } },
+        "urls": { "type": "array", "items": { "type": "string" } },
+        "accounts": { "type": "array", "items": { "type": "string" } },
+        "organizations": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["phones", "urls", "accounts", "organizations"]
+    },
+    "next_likely_step": { "type": "string" },
+    "user_advice": { "type": "string" },
+    "ask_trusted_circle": { "type": "boolean" },
+    "follow_up_question": { "type": "string" }
+  },
+  "required": ["risk_level", "scam_type", "stage", "tactics", "evidence", "entities", "next_likely_step", "user_advice", "ask_trusted_circle", "follow_up_question"]
+}
