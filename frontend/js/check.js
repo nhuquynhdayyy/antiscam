@@ -810,6 +810,40 @@
       return;
     }
 
+    // Nếu đang đăng nhập vai Mẹ (chế độ gia đình), dùng POST /family/check
+    if (
+      window.AntiScam &&
+      typeof window.AntiScam.isProtectedLoggedIn === "function" &&
+      window.AntiScam.isProtectedLoggedIn() &&
+      typeof window.AntiScam.familyCheck === "function"
+    ) {
+      if (activeAbortController) {
+        activeAbortController.abort();
+      }
+      activeAbortController = new AbortController();
+      const currentReqId = ++activeRequestId;
+      try {
+        const data = await window.AntiScam.familyCheck(text, activeAbortController.signal);
+        if (currentReqId !== activeRequestId) return;
+        renderResult(text, data);
+        if (window.AntiScam && typeof window.AntiScam.addHistory === "function") {
+          window.AntiScam.addHistory(text, data.risk_level);
+        }
+        if (data.incident && typeof window.AntiScam.showStop === "function") {
+          window.AntiScam.showStop(data.incident);
+        }
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
+        if (currentReqId !== activeRequestId) return;
+        renderError((err && err.message) || "Không thể kết nối đến máy chủ kiểm tra.");
+      } finally {
+        if (currentReqId === activeRequestId) {
+          setBusy(false);
+        }
+      }
+      return;
+    }
+
     // Chế độ gọi API thực tế qua POST "/analyze"
     if (activeAbortController) {
       activeAbortController.abort();
@@ -823,13 +857,7 @@
     }, 20000);
 
     try {
-      const apiBase =
-        window.ANTISCAM_API_BASE ||
-        ((location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "[::1]") &&
-        location.port !== "8080"
-          ? `http://${location.hostname}:8080`
-          : "");
-      const response = await fetch(`${apiBase}/analyze`, {
+      const response = await fetch("/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: text }),

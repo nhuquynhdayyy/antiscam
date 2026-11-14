@@ -36,6 +36,9 @@
     <div class="layout-grid">
       <!-- Cột chính -->
       <section class="main-column">
+        <!-- Chế độ Gia đình -->
+        <section id="family-panel" class="card family-card hidden" aria-live="polite"></section>
+
         <!-- Thanh điều hướng Tab -->
         <nav class="tabs-nav" role="tablist" aria-label="Chế độ kiểm tra">
           <button id="tab-btn-check" class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-check">
@@ -184,6 +187,9 @@
     </div>
   </main>
 
+  <!-- Lớp phủ dừng khẩn cấp (showStop) -->
+  <div id="stop-overlay" class="stop-overlay hidden" role="dialog" aria-modal="true" aria-label="Cảnh báo khẩn cấp"></div>
+
   <!-- Thông báo Toast -->
   <div id="toast" class="toast hidden" role="status" aria-live="assertive"></div>
 
@@ -192,6 +198,7 @@
   <script src="js/share.js"></script>
   <script src="js/app.js"></script>
   <script src="js/image.js"></script>
+  <script src="js/family.js"></script>
   <!--
     Các module do thành viên khác phát triển sẽ nạp thêm tại đây khi hoàn thành:
     - js/guard.js (Transaction Guard qua #guard-form, #guard-questions, #guard-result)
