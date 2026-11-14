@@ -15,6 +15,7 @@
       "items": { "type": "string", "enum": ["authority", "fear", "urgency", "secrecy", "reward", "trust_building", "scarcity"] }
     },
     "evidence": { "type": "array", "items": { "type": "string" } },
+    "extracted_text": { "type": "string" },
     "entities": {
       "type": "object",
       "properties": {
