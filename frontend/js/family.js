@@ -171,7 +171,9 @@
 
     let res;
     try {
-      res = await fetch(path, {
+      const apiBase = (window.AntiScam && window.AntiScam.API_BASE) || "";
+      const url = path.startsWith("/") ? apiBase + path : path;
+      res = await fetch(url, {
         method: options.method || "GET",
         headers: headers,
         body: options.body ? JSON.stringify(options.body) : undefined,
@@ -1022,11 +1024,29 @@
     panel.replaceChildren();
 
     if (!IS_MOCK && !familyAvailable) {
+      const row = document.createElement("div");
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.justifyContent = "space-between";
+      row.style.gap = "12px";
+      row.style.flexWrap = "wrap";
+
       const msg = document.createElement("p");
       msg.className = "meta";
       msg.style.margin = "0";
       msg.textContent = "Chế độ gia đình chưa sẵn sàng";
-      panel.appendChild(msg);
+
+      const demoLink = document.createElement("a");
+      demoLink.href = "demo-split.html";
+      demoLink.target = "_blank";
+      demoLink.rel = "noopener noreferrer";
+      demoLink.className = "btn";
+      demoLink.style.textDecoration = "none";
+      demoLink.textContent = "Thử xem demo chế độ gia đình";
+
+      row.appendChild(msg);
+      row.appendChild(demoLink);
+      panel.appendChild(row);
       return;
     }
 
