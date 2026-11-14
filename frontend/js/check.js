@@ -22,7 +22,6 @@
 
   const API_BASE = resolveApiBase();
   const MOCK = params.get("mock") === "1";
-  const MOCK = params.get("mock") === "1";
 
   // Bảng map scam_type sang tiếng Việt
   const SCAM_TYPE_MAP = {
