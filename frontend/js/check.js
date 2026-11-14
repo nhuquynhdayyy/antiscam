@@ -5,7 +5,23 @@
 (function () {
   window.AntiScam = window.AntiScam || {};
 
+  const CLOUD_API = "https://antiscam-api-592786664145.asia-southeast1.run.app";
   const params = new URLSearchParams(location.search);
+
+  function resolveApiBase() {
+    const fromQuery = params.get("api");
+    if (fromQuery) return fromQuery.replace(/\/$/, "");
+    if (location.hostname.endsWith(".run.app") || location.port === "8080") {
+      return location.origin;
+    }
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+      return "http://localhost:8080";
+    }
+    return CLOUD_API;
+  }
+
+  const API_BASE = resolveApiBase();
+  const MOCK = params.get("mock") === "1";
   const MOCK = params.get("mock") === "1";
 
   // Bảng map scam_type sang tiếng Việt
@@ -412,6 +428,10 @@
     errBox.append(msg, retryBtn);
     box.append(errBox);
   }
+  // Khởi tạo namespace dùng chung theo hợp đồng
+  window.AntiScam = window.AntiScam || {};
+  window.AntiScam.API_BASE = API_BASE;
+  window.AntiScam.MOCK = MOCK;
 
   /**
    * Vẽ thẻ kết quả phân tích theo hợp đồng vào #result
