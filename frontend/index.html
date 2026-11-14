@@ -92,7 +92,7 @@
 
             <!-- Các mẫu thử sẵn -->
             <div class="samples-row">
-              <span class="samples-label">Mẫu thử:</span>
+              <span class="samples-label">Thử mẫu:</span>
               <div id="samples" style="display: inline-flex; gap: 8px; flex-wrap: wrap;"></div>
             </div>
           </section>
@@ -112,7 +112,7 @@
         </div>
 
         <!-- Khung kết quả phân tích dùng chung -->
-        <section id="result" class="card hidden"></section>
+        <section id="result" class="card hidden" aria-live="polite"></section>
 
         <p class="meta" style="text-align: center; margin-top: 16px;">
           Chỉ để tham khảo. AntiScam không tự chuyển tiền hay liên hệ bất kỳ ai thay bạn.
@@ -130,7 +130,9 @@
             </svg>
             Lịch sử kiểm tra
           </h2>
-          <p class="history-empty">Chưa có lượt kiểm tra nào trong phiên làm việc này.</p>
+          <div id="history-list">
+            <p class="history-empty">Chưa có lượt kiểm tra nào trong phiên làm việc này.</p>
+          </div>
         </section>
 
         <!-- Thẻ dấu hiệu cần dừng lại -->
@@ -182,8 +184,12 @@
     </div>
   </main>
 
+  <!-- Thông báo Toast -->
+  <div id="toast" class="toast hidden" role="status" aria-live="assertive"></div>
+
   <!-- Thứ tự nạp: check.js phải trước image.js vì image.js dùng window.AntiScam.renderResult -->
   <script src="js/check.js"></script>
+  <script src="js/share.js"></script>
   <script src="js/app.js"></script>
   <script src="js/image.js"></script>
   <!--

@@ -42,6 +42,11 @@ Trường `extracted_text` để trống (chuỗi rỗng).
 6. user_advice: 1-2 câu tiếng Việt, đơn giản, nói rõ việc nên làm NGAY (ví dụ: dừng chuyển tiền, không đọc OTP, tự gọi hotline chính thức của ngân hàng).
 7. ask_trusted_circle: true nếu risk_level là danger, hoặc đang ở giai đoạn action_request liên quan tiền.
 8. follow_up_question: nếu còn thiếu tín hiệu, 1 câu hỏi ngắn để hỏi lại người dùng (ví dụ: "Họ có yêu cầu giữ bí mật không?"). Nếu đủ thông tin thì để chuỗi rỗng.
+9. suggested_replies:
+   - Nếu risk_level là suspicious hoặc danger: gợi ý 2-3 câu trả lời mẫu ngắn gọn bằng tiếng Việt để người dùng gửi lại kiểm chứng hoặc từ chối an toàn. Mỗi phần tử gồm:
+     - label: nhãn ngắn (ví dụ: "Hỏi vặn xác minh", "Yêu cầu kênh chính thức", "Từ chối khéo").
+     - text: câu trả lời hoàn chỉnh, lịch sự nhưng dứt khoát, không chửi bới hay kích động, không tiết lộ thông tin cá nhân.
+   - Nếu risk_level là safe: để mảng rỗng [].
 
 ## Mức rủi ro
 - safe: không có dấu hiệu lừa đảo. KHÔNG báo bừa: thông báo ngân hàng thật không có link lạ, tin nhắn bạn bè thông thường, mã OTP tự mình vừa yêu cầu thì vẫn safe nhưng nhắc không chia sẻ OTP.

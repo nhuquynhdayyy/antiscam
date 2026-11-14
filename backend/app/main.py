@@ -37,6 +37,22 @@ def health():
     return {"status": "ok"}
 
 
+def default_suggested_replies(level: str) -> list:
+    """Câu trả lời phản biện mặc định khi chỉ dùng luật hoặc Gemini chưa gợi ý."""
+    if level == "safe":
+        return []
+    return [
+        {
+            "label": "Yêu cầu xác minh",
+            "text": "Tôi sẽ tự liên hệ qua số tổng đài hoặc kênh chính thức để xác minh thông tin này trước khi thực hiện.",
+        },
+        {
+            "label": "Từ chối giao dịch",
+            "text": "Tôi không thực hiện chuyển tiền, đặt cọc hay cung cấp mã OTP qua tin nhắn. Xin cảm ơn.",
+        },
+    ]
+
+
 def rules_only_result(ent: dict) -> dict:
     """Kết quả dự phòng khi Gemini không dùng được: chỉ dựa trên luật kiểm tra."""
     level = "safe" if ent["rule_level"] == "none" else ent["rule_level"]
@@ -57,6 +73,7 @@ def rules_only_result(ent: dict) -> dict:
         "user_advice": advice,
         "ask_trusted_circle": level == "danger",
         "follow_up_question": "",
+        "suggested_replies": default_suggested_replies(level),
     }
 
 
@@ -83,6 +100,8 @@ def analyze(req: AnalyzeRequest):
                 llm["evidence"].append(m.group(0))
 
     result = merge_with_analyst(llm, ent)  # luật thắng: chỉ nâng mức rủi ro
+    if result.get("risk_level") != "safe" and not result.get("suggested_replies"):
+        result["suggested_replies"] = default_suggested_replies(result["risk_level"])
     result["degraded"] = degraded
     if degraded:
         result["decided_by"] = "rules"
