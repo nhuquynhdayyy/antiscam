@@ -46,6 +46,34 @@
   .err { color:var(--danger); }
   .hidden { display:none; }
   .meta { color:var(--muted); font-size:.85rem; }
+
+  /* ── Drop-zone ── */
+  #drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 20px 16px;
+    text-align: center;
+    color: var(--muted);
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    margin-top: 10px;
+    user-select: none;
+  }
+  #drop-zone:hover, #drop-zone.dragover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+  }
+  #drop-zone.loading {
+    opacity: .6;
+    cursor: wait;
+    pointer-events: none;
+  }
+  #drop-zone input[type=file] { display:none; }
+  #image-preview {
+    max-width: 100%; max-height: 180px; border-radius: 8px;
+    display: block; margin: 10px auto 0; object-fit: contain;
+    border: 1px solid var(--border);
+  }
 </style>
 </head>
 <body>
@@ -53,6 +81,7 @@
   <h1>🛡️ AntiScam</h1>
   <p class="sub">Dán tin nhắn, link hoặc tình huống đáng ngờ. AntiScam giúp bạn kiểm tra trước khi hành động.</p>
 
+  <!-- Phần kiểm tra tin nhắn văn bản -->
   <section class="card">
     <textarea id="input" placeholder="Dán nội dung đáng ngờ vào đây…"></textarea>
     <div class="row">
@@ -60,6 +89,19 @@
       <span id="status" class="meta"></span>
     </div>
     <div class="row samples" id="samples"><span class="meta">Mẫu thử:</span></div>
+  </section>
+
+  <!-- Phần thả ảnh chụp màn hình -->
+  <section class="card">
+    <h3 style="margin-top:0">📷 Thả ảnh chụp màn hình</h3>
+    <p class="meta" style="margin:0 0 4px">Hỗ trợ: kéo thả, chọn file, hoặc dán ảnh (Ctrl+V) khi không focus vào ô nhập chữ.</p>
+    <div id="drop-zone">
+      <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp">
+      <span>Kéo ảnh vào đây, hoặc <strong>bấm để chọn file</strong></span><br>
+      <span class="meta">PNG · JPEG · WebP · tối đa 4 MB</span>
+    </div>
+    <img id="image-preview" class="hidden" alt="Ảnh đang phân tích">
+    <p id="image-status" class="meta" style="margin:6px 0 0"></p>
   </section>
 
   <section id="result" class="card hidden"></section>
@@ -149,12 +191,21 @@ function listSection(title, items) {
             el("ul", {}, ...items.map((x) => el("li", { textContent: x }))));
 }
 
-function render(text, d) {
+/**
+ * renderResult(text, d) – vẽ kết quả phân tích vào #result
+ * Được expose qua window.AntiScam.renderResult để image.js và guard.js dùng chung.
+ * @param {string} text  – văn bản hiển thị (extracted_text với ảnh, text gốc với tin nhắn)
+ * @param {object} d     – object JSON từ /analyze hoặc /analyze-image
+ */
+function renderResult(text, d) {
   const box = $("result");
   box.replaceChildren();
   box.classList.remove("hidden");
 
-  // Backend khung (stub) chưa có Analyst: hiển thị kết quả luật để vẫn thấy được luồng chạy
+  // Cuộn lên kết quả
+  box.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  // Backend khung (stub) chưa có Analyst
   if (d.stub) {
     const ent = d.entities || {};
     d = { risk_level: ent.rule_level === "none" ? "safe" : ent.rule_level, stage: "none", tactics: [],
@@ -167,9 +218,17 @@ function render(text, d) {
   if (d.stage && d.stage !== "none")
     box.append(el("span", { className: "meta", textContent: "  Giai đoạn: " + (STAGE_LABEL[d.stage] || d.stage) }));
 
+  // Cảnh báo degraded
+  if (d.degraded)
+    box.append(el("p", { className: "meta", textContent: "⚠️ Phân tích AI đang bận, đây là kết quả từ luật kiểm tra." }));
+
   if (d.user_advice) box.append(el("div", { className: "advice", textContent: d.user_advice }));
 
-  box.append(el("h3", { textContent: "Nội dung bạn gửi (cụm đáng ngờ được tô sáng)" }), highlight(text, d.evidence));
+  // Tiêu đề thay đổi tùy ảnh hay văn bản
+  const quoteTitle = d.extracted_text
+    ? "Chữ đọc từ ảnh (cụm đáng ngờ được tô sáng)"
+    : "Nội dung bạn gửi (cụm đáng ngờ được tô sáng)";
+  box.append(el("h3", { textContent: quoteTitle }), highlight(text, d.evidence));
 
   if (d.tactics && d.tactics.length) {
     const chips = el("div", { className: "chips" }, ...d.tactics.map((t) => el("span", { textContent: TACTIC_LABEL[t] || t })));
@@ -187,13 +246,16 @@ function render(text, d) {
   if (d.ask_trusted_circle) box.append(el("p", { textContent: "👥 Nên hỏi ý kiến một người bạn tin cậy trước khi làm gì tiếp." }));
 }
 
-// ---------- Sự kiện ----------
+// ---------- Expose API toàn cục cho image.js và các module khác ----------
+window.AntiScam = { renderResult, API_BASE, MOCK };
+
+// ---------- Sự kiện – Kiểm tra văn bản ----------
 async function run() {
   const text = $("input").value.trim();
   if (!text) { $("status").textContent = "Hãy dán nội dung cần kiểm tra."; return; }
   $("btn").disabled = true; $("status").textContent = "Đang phân tích…"; $("status").className = "meta";
   try {
-    render(text, await analyze(text));
+    renderResult(text, await analyze(text));
     $("status").textContent = "";
   } catch (err) {
     $("status").textContent = "Không kết nối được: " + err.message + ". Hệ thống đang bận, thử lại sau.";
@@ -209,5 +271,8 @@ for (const [name, txt] of Object.entries(SAMPLES)) {
   $("samples").append(el("button", { textContent: name, onclick: () => { $("input").value = txt; } }));
 }
 </script>
+
+<!-- image.js: xử lý kéo thả, chọn file, dán ảnh Ctrl+V -->
+<script src="js/image.js"></script>
 </body>
 </html>
