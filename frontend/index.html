@@ -1,278 +1,195 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AntiScam – Người thứ hai tỉnh táo</title>
-<style>
-  :root {
-    --bg:#f6f7f9; --card:#fff; --text:#1c2430; --muted:#667085; --border:#e2e6ec;
-    --safe:#1a7f4b; --safe-bg:#e6f5ec; --warn:#b26a00; --warn-bg:#fff3dc;
-    --danger:#c0262d; --danger-bg:#fde8e9; --accent:#2557d6; --mark:#ffe58a;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg:#12161c; --card:#1b212a; --text:#e8ecf2; --muted:#9aa5b5; --border:#2c3441;
-      --safe:#58d08c; --safe-bg:#143325; --warn:#f0b24d; --warn-bg:#3a2b10;
-      --danger:#ff7a80; --danger-bg:#3d1a1c; --accent:#7aa2ff; --mark:#6b5a12;
-    }
-  }
-  * { box-sizing: border-box; }
-  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-         background:var(--bg); color:var(--text); line-height:1.5; }
-  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
-  h1 { margin: 0 0 4px; font-size: 1.6rem; }
-  .sub { color: var(--muted); margin: 0 0 20px; }
-  .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:16px; }
-  textarea { width:100%; min-height:130px; resize:vertical; padding:12px; font:inherit; color:inherit;
-             background:transparent; border:1px solid var(--border); border-radius:10px; }
-  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px; }
-  button { font:inherit; cursor:pointer; border-radius:10px; border:1px solid var(--border);
-           background:transparent; color:inherit; padding:8px 14px; }
-  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
-  button:disabled { opacity:.6; cursor:wait; }
-  .samples button { font-size:.85rem; padding:5px 10px; color:var(--muted); }
-  .badge { display:inline-block; padding:4px 12px; border-radius:999px; font-weight:700; }
-  .badge.safe { background:var(--safe-bg); color:var(--safe); }
-  .badge.suspicious { background:var(--warn-bg); color:var(--warn); }
-  .badge.danger { background:var(--danger-bg); color:var(--danger); }
-  .advice { border-left:4px solid var(--accent); padding:8px 12px; margin:12px 0; background:var(--bg); border-radius:6px; }
-  .quote { white-space:pre-wrap; word-break:break-word; padding:10px 12px; border:1px dashed var(--border); border-radius:10px; }
-  mark { background:var(--mark); color:inherit; border-radius:3px; padding:0 2px; }
-  .chips span { display:inline-block; margin:2px 6px 2px 0; padding:2px 10px; border:1px solid var(--border);
-                border-radius:999px; font-size:.85rem; color:var(--muted); }
-  h3 { margin:16px 0 6px; font-size:1rem; }
-  ul { margin:4px 0; padding-left:20px; }
-  .err { color:var(--danger); }
-  .hidden { display:none; }
-  .meta { color:var(--muted); font-size:.85rem; }
-
-  /* ── Drop-zone ── */
-  #drop-zone {
-    border: 2px dashed var(--border);
-    border-radius: 10px;
-    padding: 20px 16px;
-    text-align: center;
-    color: var(--muted);
-    cursor: pointer;
-    transition: border-color .15s, background .15s;
-    margin-top: 10px;
-    user-select: none;
-  }
-  #drop-zone:hover, #drop-zone.dragover {
-    border-color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 6%, transparent);
-  }
-  #drop-zone.loading {
-    opacity: .6;
-    cursor: wait;
-    pointer-events: none;
-  }
-  #drop-zone input[type=file] { display:none; }
-  #image-preview {
-    max-width: 100%; max-height: 180px; border-radius: 8px;
-    display: block; margin: 10px auto 0; object-fit: contain;
-    border: 1px solid var(--border);
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AntiScam – Người thứ hai tỉnh táo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<main>
-  <h1>🛡️ AntiScam</h1>
-  <p class="sub">Dán tin nhắn, link hoặc tình huống đáng ngờ. AntiScam giúp bạn kiểm tra trước khi hành động.</p>
-
-  <!-- Phần kiểm tra tin nhắn văn bản -->
-  <section class="card">
-    <textarea id="input" placeholder="Dán nội dung đáng ngờ vào đây…"></textarea>
-    <div class="row">
-      <button id="btn" class="primary">Kiểm tra</button>
-      <span id="status" class="meta"></span>
+  <!-- Header cố định -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="#" class="brand" aria-label="Trang chủ AntiScam">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <div>
+          <h1 class="brand-title">AntiScam</h1>
+          <p class="brand-tagline">Người thứ hai tỉnh táo kiểm tra tin nhắn lừa đảo</p>
+        </div>
+      </a>
+      <span class="header-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Bảo vệ trực tuyến
+      </span>
     </div>
-    <div class="row samples" id="samples"><span class="meta">Mẫu thử:</span></div>
-  </section>
+  </header>
 
-  <!-- Phần thả ảnh chụp màn hình -->
-  <section class="card">
-    <h3 style="margin-top:0">📷 Thả ảnh chụp màn hình</h3>
-    <p class="meta" style="margin:0 0 4px">Hỗ trợ: kéo thả, chọn file, hoặc dán ảnh (Ctrl+V) khi không focus vào ô nhập chữ.</p>
-    <div id="drop-zone">
-      <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp">
-      <span>Kéo ảnh vào đây, hoặc <strong>bấm để chọn file</strong></span><br>
-      <span class="meta">PNG · JPEG · WebP · tối đa 4 MB</span>
+  <!-- Bố cục chính -->
+  <main class="main-wrapper">
+    <div class="layout-grid">
+      <!-- Cột chính -->
+      <section class="main-column">
+        <!-- Thanh điều hướng Tab -->
+        <nav class="tabs-nav" role="tablist" aria-label="Chế độ kiểm tra">
+          <button id="tab-btn-check" class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-check">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            Kiểm tra tin nhắn
+          </button>
+          <button id="tab-btn-guard" class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-guard">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <line x1="2" y1="10" x2="22" y2="10"/>
+            </svg>
+            Trước khi chuyển tiền
+          </button>
+        </nav>
+
+        <!-- Tab 1: Kiểm tra tin nhắn -->
+        <div id="tab-check" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-check">
+          <section class="card">
+            <div class="input-header">
+              <label for="input" class="input-label">Nội dung nghi vấn</label>
+            </div>
+            <textarea id="input" placeholder="Dán nội dung tin nhắn, số điện thoại hoặc đường link cần kiểm tra…"></textarea>
+
+            <div class="action-row">
+              <button id="btn" class="btn primary" type="button">Kiểm tra</button>
+              <button id="mic" class="btn btn-icon" type="button" title="Nhập bằng giọng nói" aria-label="Nhập bằng giọng nói">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="23"/>
+                  <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+              </button>
+              <span id="status" class="meta"></span>
+            </div>
+
+            <!-- Khung kéo thả ảnh (image.js xử lý qua #drop-zone và #file-input) -->
+            <div id="drop-zone" class="drop-zone" role="button" tabindex="0" aria-label="Tải lên ảnh chụp màn hình">
+              <svg class="drop-zone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              <p class="drop-zone-text">Kéo thả ảnh chụp màn hình vào đây hoặc bấm để chọn tệp</p>
+              <p class="drop-zone-hint">Hỗ trợ ảnh định dạng PNG, JPG, WebP (tối đa 4 MB). Có thể dán ảnh bằng Ctrl+V.</p>
+              <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp" hidden>
+            </div>
+            <!-- Xem trước ảnh và trạng thái xử lý ảnh (image.js có thể dùng) -->
+            <img id="image-preview" class="hidden" alt="Ảnh đang phân tích"
+                 style="max-width:100%; max-height:180px; display:block; margin:10px auto 0; border-radius:8px; object-fit:contain;">
+            <p id="image-status" class="meta" style="margin:6px 0 0;"></p>
+
+            <!-- Các mẫu thử sẵn -->
+            <div class="samples-row">
+              <span class="samples-label">Mẫu thử:</span>
+              <div id="samples" style="display: inline-flex; gap: 8px; flex-wrap: wrap;"></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Tab 2: Trước khi chuyển tiền -->
+        <div id="tab-guard" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-btn-guard">
+          <section class="card">
+            <h2 style="font-size: 1.15rem; margin: 0 0 12px; font-weight: 700;">Đánh giá an toàn giao dịch chuyển tiền</h2>
+            <!-- Khung form bảo vệ: guard.js sẽ tự đổ nội dung -->
+            <form id="guard-form">
+              <p class="placeholder-text">Đang chuẩn bị bảng hỏi đánh giá rủi ro trước khi chuyển tiền…</p>
+            </form>
+            <div id="guard-questions"></div>
+            <div id="guard-result"></div>
+          </section>
+        </div>
+
+        <!-- Khung kết quả phân tích dùng chung -->
+        <section id="result" class="card hidden"></section>
+
+        <p class="meta" style="text-align: center; margin-top: 16px;">
+          Chỉ để tham khảo. AntiScam không tự chuyển tiền hay liên hệ bất kỳ ai thay bạn.
+        </p>
+      </section>
+
+      <!-- Cột phụ (Sidebar) -->
+      <aside class="sidebar-column">
+        <!-- Thẻ lịch sử kiểm tra -->
+        <section class="card">
+          <h2 class="sidebar-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Lịch sử kiểm tra
+          </h2>
+          <p class="history-empty">Chưa có lượt kiểm tra nào trong phiên làm việc này.</p>
+        </section>
+
+        <!-- Thẻ dấu hiệu cần dừng lại -->
+        <section class="card">
+          <h2 class="sidebar-title">
+            <svg class="sign-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            Dấu hiệu cần dừng lại
+          </h2>
+          <ul class="sign-list">
+            <li class="sign-item">
+              <svg class="sign-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>Yêu cầu chuyển tiền gấp để xử lý sự cố khẩn cấp hoặc nhận thưởng.</span>
+            </li>
+            <li class="sign-item">
+              <svg class="sign-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>Tuyển cộng tác viên online làm nhiệm vụ nạp cọc với cam kết hoàn vốn cao.</span>
+            </li>
+            <li class="sign-item">
+              <svg class="sign-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>Tự xưng công an, viện kiểm sát hoặc cán bộ thuế gọi điện thoại đe dọa.</span>
+            </li>
+            <li class="sign-item">
+              <svg class="sign-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>Gửi đường link lạ yêu cầu đăng nhập tài khoản ngân hàng hoặc quét mã QR.</span>
+            </li>
+          </ul>
+        </section>
+      </aside>
     </div>
-    <img id="image-preview" class="hidden" alt="Ảnh đang phân tích">
-    <p id="image-status" class="meta" style="margin:6px 0 0"></p>
-  </section>
+  </main>
 
-  <section id="result" class="card hidden"></section>
-  <p class="meta">Chỉ để tham khảo. AntiScam không tự chuyển tiền hay liên hệ ai thay bạn.</p>
-</main>
-
-<script>
-// ---------- Cấu hình ----------
-// Đổi địa chỉ API qua ?api=https://...run.app  (mặc định chạy local). ?mock=1 để dựng giao diện không cần backend.
-const params = new URLSearchParams(location.search);
-const API_BASE = (params.get("api") || "http://localhost:8080").replace(/\/$/, "");
-const MOCK = params.get("mock") === "1";
-
-const RISK_LABEL = { safe: "An toàn", suspicious: "Đáng ngờ", danger: "Nguy hiểm" };
-const STAGE_LABEL = { none: "Chưa rõ", approach: "Tiếp cận", threat: "Đe dọa", isolation: "Cô lập",
-                      urgency: "Khẩn cấp", action_request: "Yêu cầu hành động" };
-const TACTIC_LABEL = { authority: "Giả danh quyền lực", fear: "Gây sợ hãi", urgency: "Tạo khẩn cấp",
-                       secrecy: "Yêu cầu giữ bí mật", reward: "Hứa thưởng", trust_building: "Tạo lòng tin",
-                       scarcity: "Khan hiếm" };
-const SAMPLES = {
-  "Việc làm đặt cọc": "Bên mình tuyển cộng tác viên online lương 500k-1tr/ngày. Để nhận việc bạn đặt cọc 500k, hoàn lại sau ca đầu. Chốt trong 30 phút nữa nhé, hết suất.",
-  "Link giả ngân hàng": "[Vietcombank] Tài khoản của quý khách bị khóa do chưa cập nhật sinh trắc học. Vui lòng xác thực tại http://vcb-xacthuc.top/login trước 18h hôm nay.",
-  "Tin an toàn": "Tối nay 7h đi ăn mì Quảng ở Hải Châu nhé, mình đặt bàn rồi."
-};
-
-const $ = (id) => document.getElementById(id);
-
-// ---------- Gọi API ----------
-async function analyze(text) {
-  if (MOCK) return mockResult(text);
-  const res = await fetch(API_BASE + "/analyze", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text })
-  });
-  if (!res.ok) throw new Error("Máy chủ trả về lỗi " + res.status);
-  return res.json();
-}
-
-function mockResult(text) {
-  const evidence = ["đặt cọc 500k", "Chốt trong 30 phút"].filter((e) => text.includes(e));
-  return new Promise((r) => setTimeout(() => r({
-    risk_level: evidence.length ? "danger" : "safe",
-    scam_type: "fake_job_deposit", stage: "action_request", tactics: ["reward", "urgency"],
-    evidence, entities: { phones: [], urls: [], accounts: [], organizations: [] },
-    next_likely_step: "Yêu cầu chuyển thêm phí",
-    user_advice: "Dừng lại, không chuyển tiền. Công ty thật không thu cọc để nhận việc.",
-    ask_trusted_circle: true, follow_up_question: "", rule_reasons: [], decided_by: "ai"
-  }), 600));
-}
-
-// ---------- Hiển thị ----------
-function el(tag, props = {}, ...children) {
-  const n = document.createElement(tag);
-  Object.assign(n, props);
-  for (const c of children) n.append(c);
-  return n;
-}
-
-// Tô sáng bằng chứng bằng DOM (không dùng innerHTML để tránh chèn mã độc từ tin nhắn)
-function highlight(text, evidence) {
-  const ranges = [];
-  for (const ev of evidence || []) {
-    if (!ev) continue;
-    const i = text.indexOf(ev);
-    if (i >= 0) ranges.push([i, i + ev.length]);
-  }
-  ranges.sort((a, b) => a[0] - b[0]);
-  const merged = [];
-  for (const r of ranges) {
-    const last = merged[merged.length - 1];
-    if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else merged.push([...r]);
-  }
-  const box = el("div", { className: "quote" });
-  let pos = 0;
-  for (const [s, e] of merged) {
-    box.append(text.slice(pos, s), el("mark", { textContent: text.slice(s, e) }));
-    pos = e;
-  }
-  box.append(text.slice(pos));
-  return box;
-}
-
-function listSection(title, items) {
-  if (!items || !items.length) return null;
-  return el("div", {}, el("h3", { textContent: title }),
-            el("ul", {}, ...items.map((x) => el("li", { textContent: x }))));
-}
-
-/**
- * renderResult(text, d) – vẽ kết quả phân tích vào #result
- * Được expose qua window.AntiScam.renderResult để image.js và guard.js dùng chung.
- * @param {string} text  – văn bản hiển thị (extracted_text với ảnh, text gốc với tin nhắn)
- * @param {object} d     – object JSON từ /analyze hoặc /analyze-image
- */
-function renderResult(text, d) {
-  const box = $("result");
-  box.replaceChildren();
-  box.classList.remove("hidden");
-
-  // Cuộn lên kết quả
-  box.scrollIntoView({ behavior: "smooth", block: "start" });
-
-  // Backend khung (stub) chưa có Analyst
-  if (d.stub) {
-    const ent = d.entities || {};
-    d = { risk_level: ent.rule_level === "none" ? "safe" : ent.rule_level, stage: "none", tactics: [],
-          evidence: [], entities: ent, user_advice: "(Bản khung) Mới có kết quả từ luật kiểm tra, chưa có phân tích AI.",
-          rule_reasons: ent.rule_reasons || [], follow_up_question: "" };
-  }
-
-  const risk = d.risk_level || "suspicious";
-  box.append(el("span", { className: "badge " + risk, textContent: RISK_LABEL[risk] || risk }));
-  if (d.stage && d.stage !== "none")
-    box.append(el("span", { className: "meta", textContent: "  Giai đoạn: " + (STAGE_LABEL[d.stage] || d.stage) }));
-
-  // Cảnh báo degraded
-  if (d.degraded)
-    box.append(el("p", { className: "meta", textContent: "⚠️ Phân tích AI đang bận, đây là kết quả từ luật kiểm tra." }));
-
-  if (d.user_advice) box.append(el("div", { className: "advice", textContent: d.user_advice }));
-
-  // Tiêu đề thay đổi tùy ảnh hay văn bản
-  const quoteTitle = d.extracted_text
-    ? "Chữ đọc từ ảnh (cụm đáng ngờ được tô sáng)"
-    : "Nội dung bạn gửi (cụm đáng ngờ được tô sáng)";
-  box.append(el("h3", { textContent: quoteTitle }), highlight(text, d.evidence));
-
-  if (d.tactics && d.tactics.length) {
-    const chips = el("div", { className: "chips" }, ...d.tactics.map((t) => el("span", { textContent: TACTIC_LABEL[t] || t })));
-    box.append(el("h3", { textContent: "Chiêu thao túng" }), chips);
-  }
-  const rs = listSection("Lý do từ luật kiểm tra", d.rule_reasons); if (rs) box.append(rs);
-
-  const e = d.entities || {};
-  const ents = [].concat((e.urls || []).map((x) => "Link: " + x), (e.phones || []).map((x) => "SĐT: " + x),
-                         (e.accounts || []).map((x) => "Tài khoản: " + x), (e.organizations || []).map((x) => "Giả mạo: " + x));
-  const es = listSection("Thông tin trích xuất", ents); if (es) box.append(es);
-
-  if (d.next_likely_step) box.append(el("p", { className: "meta", textContent: "Bước tiếp theo có thể xảy ra: " + d.next_likely_step }));
-  if (d.follow_up_question) box.append(el("p", { textContent: "❓ " + d.follow_up_question }));
-  if (d.ask_trusted_circle) box.append(el("p", { textContent: "👥 Nên hỏi ý kiến một người bạn tin cậy trước khi làm gì tiếp." }));
-}
-
-// ---------- Expose API toàn cục cho image.js và các module khác ----------
-window.AntiScam = { renderResult, API_BASE, MOCK };
-
-// ---------- Sự kiện – Kiểm tra văn bản ----------
-async function run() {
-  const text = $("input").value.trim();
-  if (!text) { $("status").textContent = "Hãy dán nội dung cần kiểm tra."; return; }
-  $("btn").disabled = true; $("status").textContent = "Đang phân tích…"; $("status").className = "meta";
-  try {
-    renderResult(text, await analyze(text));
-    $("status").textContent = "";
-  } catch (err) {
-    $("status").textContent = "Không kết nối được: " + err.message + ". Hệ thống đang bận, thử lại sau.";
-    $("status").className = "err";
-  } finally {
-    $("btn").disabled = false;
-  }
-}
-
-$("btn").addEventListener("click", run);
-$("input").addEventListener("keydown", (ev) => { if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) run(); });
-for (const [name, txt] of Object.entries(SAMPLES)) {
-  $("samples").append(el("button", { textContent: name, onclick: () => { $("input").value = txt; } }));
-}
-</script>
-
-<!-- image.js: xử lý kéo thả, chọn file, dán ảnh Ctrl+V -->
-<script src="js/image.js"></script>
+  <!-- Thứ tự nạp: check.js phải trước image.js vì image.js dùng window.AntiScam.renderResult -->
+  <script src="js/check.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/image.js"></script>
+  <!--
+    Các module do thành viên khác phát triển sẽ nạp thêm tại đây khi hoàn thành:
+    - js/guard.js (Transaction Guard qua #guard-form, #guard-questions, #guard-result)
+    - js/mic.js (nhận diện giọng nói qua nút #mic)
+  -->
 </body>
 </html>
