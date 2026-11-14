@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AntiScam – Demo song song Phụ huynh & Con cái</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --bd: #cbd5e1;
+      --tx: #0f172a;
+      --mu: #475569;
+      --pr: #2563eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--tx);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--bd);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .topbar h1 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .topbar p {
+      margin: 2px 0 0;
+      font-size: 0.85rem;
+      color: var(--mu);
+    }
+    .mode-switch {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--bd);
+      background: var(--card);
+      color: var(--tx);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn.active {
+      background: var(--pr);
+      border-color: var(--pr);
+      color: #fff;
+    }
+    .stage {
+      flex: 1;
+      display: flex;
+      gap: 24px;
+      padding: 20px;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .pane {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .pane-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--tx);
+    }
+    .phone-frame {
+      position: relative;
+      width: 412px;
+      height: 760px;
+      background: #0f172a;
+      border-radius: 38px;
+      padding: 12px 10px 14px;
+      box-shadow: 0 24px 50px rgba(15, 23, 42, 0.28);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+    .push-banner {
+      position: absolute;
+      top: 42px;
+      left: 18px;
+      right: 18px;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.97);
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 12px 14px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.28);
+      transform: translateY(-140%);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.25s ease;
+      pointer-events: none;
+    }
+    .push-banner.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .push-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--mu);
+      margin-bottom: 4px;
+    }
+    .push-app {
+      font-weight: 800;
+      color: #0068ff;
+    }
+    .push-app.sms {
+      color: #16a34a;
+    }
+    .push-sender {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--tx);
+      margin-bottom: 4px;
+    }
+    .push-body {
+      font-size: 0.82rem;
+      line-height: 1.4;
+      color: #334155;
+      margin: 0 0 10px;
+    }
+    .push-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .btn-zalo {
+      background: #0068ff;
+      border-color: #0068ff;
+      color: #fff;
+    }
+    .btn-sms {
+      background: #16a34a;
+      border-color: #16a34a;
+      color: #fff;
+    }
+    .phone-statusbar {
+      width: 100%;
+      padding: 2px 16px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #cbd5e1;
+      font-size: 0.72rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .phone-notch {
+      width: 96px;
+      height: 14px;
+      background: #1e293b;
+      border-radius: 999px;
+    }
+    .phone-screen {
+      width: 100%;
+      flex: 1;
+      border: none;
+      border-radius: 24px;
+      background: #fff;
+    }
+    .web-pane {
+      flex: 1;
+      min-width: 420px;
+      max-width: 780px;
+    }
+    .web-frame {
+      width: 100%;
+      height: 740px;
+      background: var(--card);
+      border: 1px solid var(--bd);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      display: flex;
+      flex-direction: column;
+    }
+    .web-chrome {
+      background: #e2e8f0;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      color: var(--mu);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--bd);
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #94a3b8;
+      display: inline-block;
+    }
+    .web-screen {
+      width: 100%;
+      flex: 1;
+      border: none;
+      background: #fff;
+    }
+    @media (max-width: 900px) {
+      .phone-frame { width: 100%; max-width: 390px; height: 640px; }
+      .web-pane { min-width: 100%; }
+      .web-frame { height: 640px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>AntiScam — Demo song song (Phụ huynh & Con cái)</h1>
+      <p>Trái: đăng nhập <strong>Mẹ Hoa</strong> (PIN 1234) → tick đồng ý → bấm Mô phỏng. Phải: đăng nhập <strong>Con gái Lan</strong> (PIN 1234) để nhận cảnh báo.</p>
+    </div>
+    <div class="mode-switch">
+      <button id="btn-sim-zalo" type="button" class="btn btn-zalo">Nhảy tin Zalo (CCCD)</button>
+      <button id="btn-sim-sms" type="button" class="btn btn-sms">Nhảy tin SMS (CCCD)</button>
+      <button id="btn-mock" type="button" class="btn active">Mock (?mock=1)</button>
+      <button id="btn-live" type="button" class="btn">Backend thật</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="pane">
+      <div class="pane-label">1. Điện thoại Phụ huynh (Mẹ Hoa)</div>
+      <div class="phone-frame">
+        <div class="phone-statusbar">
+          <span>9:41</span>
+          <div class="phone-notch"></div>
+          <span>5G · 100%</span>
+        </div>
+        <div id="push-banner" class="push-banner" role="alert">
+          <div class="push-head">
+            <span id="push-app" class="push-app">Zalo</span>
+            <span>Vừa xong</span>
+          </div>
+          <div class="push-sender">Cán bộ Công an khu vực (Lạ)</div>
+          <p id="push-body" class="push-body"></p>
+          <p style="margin: 0 0 10px; padding: 6px 8px; border-radius: 8px; background: #fef2f2; color: #b91c1c; font-size: 0.78rem; font-weight: 700;">
+            ⛔ AntiScam cảnh báo: Tin nhắn có dấu hiệu lừa đảo (Cập nhật CCCD giả mạo)!
+          </p>
+          <div class="push-actions">
+            <button id="push-dismiss" type="button" class="btn">Đóng</button>
+            <button id="push-scan" type="button" class="btn active">Kiểm tra ngay</button>
+          </div>
+        </div>
+        <iframe id="frame-parent" class="phone-screen" src="index.html?mock=1" title="Màn hình điện thoại Phụ huynh"></iframe>
+      </div>
+    </section>
+
+    <section class="pane web-pane">
+      <div class="pane-label">2. Màn hình Web của Con cái (Con gái Lan)</div>
+      <div class="web-frame">
+        <div class="web-chrome">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span>AntiScam — Máy Con</span>
+        </div>
+        <iframe id="frame-child" class="web-screen" src="index.html?mock=1" title="Màn hình Web của Con cái"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var btnMock = document.getElementById("btn-mock");
+      var btnLive = document.getElementById("btn-live");
+      var btnSimZalo = document.getElementById("btn-sim-zalo");
+      var btnSimSms = document.getElementById("btn-sim-sms");
+      var pushBanner = document.getElementById("push-banner");
+      var pushApp = document.getElementById("push-app");
+      var pushBody = document.getElementById("push-body");
+      var pushDismiss = document.getElementById("push-dismiss");
+      var pushScan = document.getElementById("push-scan");
+      var frameParent = document.getElementById("frame-parent");
+      var frameChild = document.getElementById("frame-child");
+      var autoScanTimer = null;
+
+      var CCCD_SCAM_TEXT = "Thông báo từ Công an khu vực: Công dân cần cập nhật lại thông tin Căn cước công dân (CCCD) gấp trong 30 phút tại http://vneid-capnhat-cccd.xyz để tránh bị khóa định danh và tài khoản ngân hàng.";
+
+      function setMode(isMock) {
+        var target = isMock ? "index.html?mock=1" : "index.html";
+        frameParent.src = target;
+        frameChild.src = target;
+        btnMock.classList.toggle("active", isMock);
+        btnLive.classList.toggle("active", !isMock);
+      }
+
+      function runScanInParent() {
+        clearTimeout(autoScanTimer);
+        pushBanner.classList.remove("show");
+        try {
+          var win = frameParent.contentWindow;
+          if (win && win.AntiScam && typeof win.AntiScam.runCheck === "function") {
+            win.AntiScam.runCheck(CCCD_SCAM_TEXT);
+          }
+        } catch (e) {
+          // Bỏ qua nếu iframe chưa sẵn sàng
+        }
+      }
+
+      function triggerPush(channel) {
+        clearTimeout(autoScanTimer);
+        pushApp.textContent = channel === "sms" ? "Tin nhắn SMS" : "Zalo";
+        pushApp.className = channel === "sms" ? "push-app sms" : "push-app";
+        pushBody.textContent = CCCD_SCAM_TEXT;
+        pushBanner.classList.add("show");
+      }
+
+      btnSimZalo.addEventListener("click", function () { triggerPush("zalo"); });
+      btnSimSms.addEventListener("click", function () { triggerPush("sms"); });
+      pushScan.addEventListener("click", runScanInParent);
+      pushDismiss.addEventListener("click", function () {
+        clearTimeout(autoScanTimer);
+        pushBanner.classList.remove("show");
+      });
+      btnMock.addEventListener("click", function () { setMode(true); });
+      btnLive.addEventListener("click", function () { setMode(false); });
+    })();
+  </script>
+</body>
+</html>

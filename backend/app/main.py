@@ -17,7 +17,7 @@ try:  # đọc .env ở thư mục gốc repo nếu có cài python-dotenv
 except ImportError:
     pass
 
-from . import analyst
+from . import analyst, family
 from .entity_intel import INJECTION_PATTERNS, analyze_entities, merge_with_analyst
 from .routers import guard, vision
 
@@ -26,6 +26,7 @@ app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
 app.include_router(vision.router)
+app.include_router(family.router)
 app.include_router(guard.router)
 
 

@@ -163,6 +163,32 @@
         decided_by: "rules",
         degraded: true
       }
+    },
+    {
+      id: "danger_cccd",
+      name: "Cập nhật CCCD giả mạo",
+      text: "Thông báo từ Công an khu vực: Công dân cần cập nhật lại thông tin Căn cước công dân (CCCD) gấp trong 30 phút tại http://vneid-capnhat-cccd.xyz để tránh bị khóa định danh và tài khoản ngân hàng.",
+      data: {
+        risk_level: "danger",
+        scam_type: "fake_authority",
+        stage: "action_request",
+        tactics: ["authority", "urgency", "threat"],
+        evidence: ["cập nhật lại thông tin Căn cước công dân", "http://vneid-capnhat-cccd.xyz", "gấp trong 30 phút"],
+        entities: { phones: [], urls: ["http://vneid-capnhat-cccd.xyz"], accounts: [] },
+        next_likely_step: "dụ cài app giả mạo VNeID để chiếm quyền điều khiển điện thoại và rút tiền",
+        user_advice: "Tuyệt đối không bấm link lạ hoặc cài app ngoài Google Play/App Store. Công an không yêu cầu cập nhật CCCD qua Zalo/SMS.",
+        ask_trusted_circle: true,
+        follow_up_question: "",
+        suggested_replies: [
+          {
+            label: "Từ chối làm online",
+            text: "Tôi sẽ trực tiếp ra Công an phường/xã để kiểm tra và cập nhật thông tin, không bấm vào đường link này."
+          }
+        ],
+        rule_reasons: ["Giả danh công an yêu cầu cập nhật CCCD", "Đường link giả mạo VNeID (.xyz)"],
+        decided_by: "ai",
+        degraded: false
+      }
     }
   ];
 
@@ -825,7 +851,48 @@
       setTimeout(function () {
         if (btn) btn.disabled = false;
         window.AntiScam.renderResult(text, matchedData);
+        if (
+          matchedData.risk_level === "danger" &&
+          window.AntiScam &&
+          typeof window.AntiScam.triggerMockIncident === "function"
+        ) {
+          window.AntiScam.triggerMockIncident(text, matchedData);
+        }
       }, 300);
+      return;
+    }
+
+    // Nếu đang đăng nhập vai Mẹ (chế độ gia đình), dùng POST /family/check
+    if (
+      window.AntiScam &&
+      typeof window.AntiScam.isProtectedLoggedIn === "function" &&
+      window.AntiScam.isProtectedLoggedIn() &&
+      typeof window.AntiScam.familyCheck === "function"
+    ) {
+      if (activeAbortController) {
+        activeAbortController.abort();
+      }
+      activeAbortController = new AbortController();
+      const currentReqId = ++activeRequestId;
+      try {
+        const data = await window.AntiScam.familyCheck(text, activeAbortController.signal);
+        if (currentReqId !== activeRequestId) return;
+        renderResult(text, data);
+        if (window.AntiScam && typeof window.AntiScam.addHistory === "function") {
+          window.AntiScam.addHistory(text, data.risk_level);
+        }
+        if (data.incident && typeof window.AntiScam.showStop === "function") {
+          window.AntiScam.showStop(data.incident);
+        }
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
+        if (currentReqId !== activeRequestId) return;
+        renderError((err && err.message) || "Không thể kết nối đến máy chủ kiểm tra.");
+      } finally {
+        if (currentReqId === activeRequestId) {
+          setBusy(false);
+        }
+      }
       return;
     }
 
@@ -842,13 +909,7 @@
     }, 20000);
 
     try {
-      const apiBase =
-        window.ANTISCAM_API_BASE ||
-        ((location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "[::1]") &&
-        location.port !== "8080"
-          ? `http://${location.hostname}:8080`
-          : "");
-      const response = await fetch(`${apiBase}/analyze`, {
+      const response = await fetch("/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: text }),
