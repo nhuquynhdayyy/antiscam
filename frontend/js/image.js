@@ -55,7 +55,9 @@
     const apiBase = (
       window.AntiScam?.API_BASE ||
       new URLSearchParams(location.search).get("api") ||
-      "http://localhost:8080"
+      (location.hostname.endsWith(".run.app") || location.port === "8080"
+        ? location.origin
+        : "http://localhost:8080")
     ).replace(/\/$/, "");
 
     // Chế độ mock: trả kết quả giả để Người 3 dựng giao diện
