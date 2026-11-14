@@ -29,35 +29,4 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   });
-
-  // Hỗ trợ click vào drop-zone để mở hộp thoại chọn tệp
-  const dropZone = document.getElementById("drop-zone");
-  const fileInput = document.getElementById("file-input");
-
-  if (dropZone && fileInput) {
-    dropZone.addEventListener("click", function () {
-      fileInput.click();
-    });
-
-    dropZone.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        fileInput.click();
-      }
-    });
-
-    ["dragenter", "dragover"].forEach(function (evtName) {
-      dropZone.addEventListener(evtName, function (e) {
-        e.preventDefault();
-        dropZone.classList.add("dragover");
-      });
-    });
-
-    ["dragleave", "drop"].forEach(function (evtName) {
-      dropZone.addEventListener(evtName, function (e) {
-        e.preventDefault();
-        dropZone.classList.remove("dragover");
-      });
-    });
-  }
 });
