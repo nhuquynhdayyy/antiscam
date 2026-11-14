@@ -442,9 +442,15 @@
 
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
-    closeBtn.className = "btn";
-    closeBtn.textContent = "Đóng cảnh báo";
-    closeBtn.onclick = closeStopOverlay;
+    closeBtn.className = "btn primary";
+    closeBtn.textContent = "Xem phân tích scam ở chỗ nào";
+    closeBtn.onclick = function () {
+      closeStopOverlay();
+      const resultBox = $("result");
+      if (resultBox && !resultBox.classList.contains("hidden")) {
+        resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    };
     footer.appendChild(closeBtn);
 
     modal.append(header, summaryBox, listTitle, list, footer);
@@ -1078,6 +1084,46 @@
   });
 
   window.AntiScam.showStop = showStop;
+  window.AntiScam.triggerMockIncident = function (text, data) {
+    if (!IS_MOCK || !currentUser || currentUser.role !== "protected") return;
+    if (!mockConsent) {
+      showToast("Chưa bật đồng ý nên chưa tự động báo cho người thân.");
+      return;
+    }
+    const dLan = {
+      id: mockDeliverySeq++,
+      guardian_id: "lan",
+      guardian_name: "Con gái Lan",
+      notify: "auto",
+      status: "sent",
+      send_at: new Date().toISOString(),
+      protected_name: "Mẹ Hoa",
+      protected_phone: "+84900000001",
+      scam_type: (data && data.scam_type) || "other",
+      summary: String(text || "").slice(0, 140),
+      evidence: (data && Array.isArray(data.evidence)) ? data.evidence.slice(0, 5) : []
+    };
+    const dHung = {
+      id: mockDeliverySeq++,
+      guardian_id: "hung",
+      guardian_name: "Chú Hùng",
+      notify: "manual",
+      status: "not_sent",
+      send_at: null
+    };
+    const inc = {
+      id: mockIncidentSeq++,
+      scam_type: dLan.scam_type,
+      risk_level: "danger",
+      summary: dLan.summary,
+      evidence: dLan.evidence,
+      deliveries: [dLan, dHung]
+    };
+    if (mockChannel) {
+      mockChannel.postMessage({ type: "mock_alert", delivery: dLan, incident: inc });
+    }
+    showStop(inc);
+  };
   window.AntiScam.isProtectedLoggedIn = function () {
     return Boolean(!IS_MOCK && authToken && currentUser && currentUser.role === "protected");
   };

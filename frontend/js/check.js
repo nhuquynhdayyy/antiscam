@@ -148,6 +148,32 @@
         decided_by: "rules",
         degraded: true
       }
+    },
+    {
+      id: "danger_cccd",
+      name: "Cập nhật CCCD giả mạo",
+      text: "Thông báo từ Công an khu vực: Công dân cần cập nhật lại thông tin Căn cước công dân (CCCD) gấp trong 30 phút tại http://vneid-capnhat-cccd.xyz để tránh bị khóa định danh và tài khoản ngân hàng.",
+      data: {
+        risk_level: "danger",
+        scam_type: "fake_authority",
+        stage: "action_request",
+        tactics: ["authority", "urgency", "threat"],
+        evidence: ["cập nhật lại thông tin Căn cước công dân", "http://vneid-capnhat-cccd.xyz", "gấp trong 30 phút"],
+        entities: { phones: [], urls: ["http://vneid-capnhat-cccd.xyz"], accounts: [] },
+        next_likely_step: "dụ cài app giả mạo VNeID để chiếm quyền điều khiển điện thoại và rút tiền",
+        user_advice: "Tuyệt đối không bấm link lạ hoặc cài app ngoài Google Play/App Store. Công an không yêu cầu cập nhật CCCD qua Zalo/SMS.",
+        ask_trusted_circle: true,
+        follow_up_question: "",
+        suggested_replies: [
+          {
+            label: "Từ chối làm online",
+            text: "Tôi sẽ trực tiếp ra Công an phường/xã để kiểm tra và cập nhật thông tin, không bấm vào đường link này."
+          }
+        ],
+        rule_reasons: ["Giả danh công an yêu cầu cập nhật CCCD", "Đường link giả mạo VNeID (.xyz)"],
+        decided_by: "ai",
+        degraded: false
+      }
     }
   ];
 
@@ -806,6 +832,13 @@
       setTimeout(function () {
         if (btn) btn.disabled = false;
         window.AntiScam.renderResult(text, matchedData);
+        if (
+          matchedData.risk_level === "danger" &&
+          window.AntiScam &&
+          typeof window.AntiScam.triggerMockIncident === "function"
+        ) {
+          window.AntiScam.triggerMockIncident(text, matchedData);
+        }
       }, 300);
       return;
     }

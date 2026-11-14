@@ -1027,6 +1027,147 @@ details.check-details[open] summary {
   font-size: 0.92rem;
   background-color: var(--sf);
   color: var(--tx);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  html, body {
+    scrollbar-width: none;
+    overflow-x: hidden;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header-badge {
+    display: none;
+  }
+
+  .app-header .header-container {
+    padding: 8px 12px;
+  }
+
+  .brand-title {
+    font-size: 1.05rem;
+  }
+
+  .main-wrapper {
+    padding: 8px 8px 24px;
+  }
+
+  .layout-grid,
+  .main-column,
+  .sidebar-column,
+  .card,
+  #result {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+  }
+
+  .card {
+    padding: 12px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  }
+
+  .stage-steps {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .stage-step {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+
+  .next-step-hint {
+    align-items: flex-start;
+  }
+
+  .reply-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reply-copy-btn {
+    align-self: flex-end;
+  }
+
+  .tabs-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    background-color: rgba(15, 23, 42, 0.06);
+    padding: 4px;
+    border-radius: 12px;
+    border-bottom: none;
+    margin-bottom: 10px;
+  }
+
+  .tab-btn {
+    padding: 8px 6px;
+    font-size: 0.8rem;
+    gap: 4px;
+    justify-content: center;
+    border-radius: 9px;
+    border-bottom: none;
+  }
+
+  .tab-btn.active {
+    background-color: var(--sf);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-bottom: none;
+  }
+
+  textarea#input {
+    min-height: 88px;
+    font-size: 0.9rem;
+  }
+
+  .action-row #btn {
+    flex: 1;
+  }
+
+  .drop-zone {
+    padding: 12px 10px;
+  }
+
+  .family-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .family-account-btns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .family-account-btns .btn {
+    padding: 8px 6px;
+    font-size: 0.8rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .family-login-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .family-pin-input,
+  .family-login-form .btn,
+  .family-select,
+  .family-simulate-row .btn {
+    width: 100%;
+  }
 }
 
 .family-consent-row {

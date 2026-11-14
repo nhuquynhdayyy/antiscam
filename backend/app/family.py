@@ -314,9 +314,9 @@ def _maybe_create_incident(user_id: str, text: str, analysis: dict) -> Optional[
         _NEXT_DELIVERY_ID += 1
         notify = g.get("notify", "manual")
         if notify == "auto":
-            status = "pending"
-            send_at_ts = now + AUTO_SEND_DELAY_SECONDS
-            send_at = _now_iso(send_at_ts)
+            status = "sent"
+            send_at_ts = None
+            send_at = None
         else:
             status = "not_sent"
             send_at_ts = None
@@ -341,6 +341,8 @@ def _maybe_create_incident(user_id: str, text: str, analysis: dict) -> Optional[
             "evidence": evidence,
         }
         _DELIVERIES[did] = d_obj
+        if status == "sent":
+            deliver(d_obj)
         deliveries.append(d_obj)
 
     inc = {
