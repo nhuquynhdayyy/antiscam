@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "note": "DỮ LIỆU DEMO, không phải số tài khoản thật của ai",
+    "version": 1
+  },
+  "accounts": [
+    {
+      "account": "0123456789",
+      "bank": "Ngân hàng demo",
+      "note": "Bị tố cáo: tuyển cộng tác viên thu tiền đặt cọc (dữ liệu demo)",
+      "reports": 12
+    },
+    {
+      "account": "1029384756",
+      "bank": "Ngân hàng demo",
+      "note": "Bị tố cáo: giả mạo homestay tại Đà Nẵng yêu cầu cọc 100% giữ phòng (dữ liệu demo)",
+      "reports": 8
+    },
+    {
+      "account": "9876543210",
+      "bank": "Ngân hàng demo",
+      "note": "Bị tố cáo: giả danh công an yêu cầu chuyển tiền vào tài khoản an toàn điều tra (dữ liệu demo)",
+      "reports": 15
+    },
+    {
+      "account": "112233445566",
+      "bank": "Ngân hàng demo",
+      "note": "Bị tố cáo: dụ dỗ nạp tiền sàn đầu tư tiền ảo sinh lời cao (dữ liệu demo)",
+      "reports": 20
+    },
+    {
+      "account": "5566778899",
+      "bank": "Ngân hàng demo",
+      "note": "Bị tố cáo: bán hàng online nhận tiền cọc rồi chặn liên lạc (dữ liệu demo)",
+      "reports": 9
+    },
+    {
+      "account": "998877665544",
+      "bank": "Ngân hàng demo",
+      "note": "Bị tố cáo: mạo danh người thân nhắn tin mượn tiền cấp cứu (dữ liệu demo)",
+      "reports": 6
+    }
+  ]
+}

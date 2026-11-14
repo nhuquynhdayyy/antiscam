@@ -7,6 +7,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 try:  # đọc .env ở thư mục gốc repo nếu có cài python-dotenv
@@ -18,7 +19,7 @@ except ImportError:
 
 from . import analyst, family
 from .entity_intel import INJECTION_PATTERNS, analyze_entities, merge_with_analyst
-from .routers import vision
+from .routers import guard, vision
 
 app = FastAPI(title="AntiScam API")
 app.add_middleware(
@@ -26,6 +27,7 @@ app.add_middleware(
 )
 app.include_router(vision.router)
 app.include_router(family.router)
+app.include_router(guard.router)
 
 
 class AnalyzeRequest(BaseModel):
@@ -106,3 +108,13 @@ def analyze(req: AnalyzeRequest):
     if degraded:
         result["decided_by"] = "rules"
     return result
+
+
+# Phục vụ giao diện tĩnh tại "/" (đặt cuối cùng để không che các route API ở trên)
+for _frontend_dir in (
+    Path(__file__).resolve().parents[1] / "frontend",  # trong Docker (/app/frontend)
+    Path(__file__).resolve().parents[2] / "frontend",  # khi chạy local từ repo
+):
+    if _frontend_dir.is_dir():
+        app.mount("/", StaticFiles(directory=str(_frontend_dir), html=True), name="frontend")
+        break
