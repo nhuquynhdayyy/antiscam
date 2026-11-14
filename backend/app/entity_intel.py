@@ -5,6 +5,7 @@ Chạy thử (từ thư mục backend/): python -m app.entity_intel
 import json
 import re
 from pathlib import Path
+from typing import Optional
 from urllib.parse import urlparse
 
 # ---------- Cấu hình (kiểm tra lại danh sách tên miền chính thức trước khi demo) ----------
@@ -182,7 +183,79 @@ def merge_with_analyst(llm, ent):
     return out
 
 
+# ---------- Danh sách tài khoản đã bị tố cáo ----------
+_REPORTED_ACCOUNTS_CACHE = None
+REPORTED_ACCOUNTS_PATH = Path(__file__).resolve().parents[2] / "data" / "reported_accounts.json"
+
+
+def _load_reported_accounts(custom_path: Optional[Path] = None) -> dict:
+    target = custom_path or REPORTED_ACCOUNTS_PATH
+    if not target.is_file():
+        alt_target = Path(__file__).resolve().parents[1] / "data" / "reported_accounts.json"
+        if alt_target.is_file():
+            target = alt_target
+        else:
+            return {}
+    try:
+        with open(target, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            accounts_map = {}
+            for item in data.get("accounts", []):
+                acc = re.sub(r"\D", "", str(item.get("account", "")))
+                if acc:
+                    accounts_map[acc] = item.get("note", "")
+            return accounts_map
+    except Exception:
+        return {}
+
+
+def check_reported_account(account: str) -> dict:
+    """Kiểm tra số tài khoản có trong danh sách đen/tố cáo hay không.
+    Chuẩn hóa bỏ dấu cách, gạch ngang, chấm.
+    Trả đúng: {"reported": bool, "note": str}
+    """
+    global _REPORTED_ACCOUNTS_CACHE
+    if _REPORTED_ACCOUNTS_CACHE is None:
+        _REPORTED_ACCOUNTS_CACHE = _load_reported_accounts()
+
+    clean_acc = re.sub(r"\D", "", str(account)) if account is not None else ""
+    if clean_acc and clean_acc in _REPORTED_ACCOUNTS_CACHE:
+        return {"reported": True, "note": _REPORTED_ACCOUNTS_CACHE[clean_acc]}
+    return {"reported": False, "note": ""}
+
+
+def test_check_reported_account():
+    # Test 1: Số khớp
+    res1 = check_reported_account("0123456789")
+    assert res1["reported"] is True, f"Lỗi test 1: kết quả {res1}"
+    assert "tuyển cộng tác viên" in res1["note"], f"Lỗi test 1: ghi chú không khớp: {res1['note']}"
+
+    # Test 2: Số không khớp
+    res2 = check_reported_account("9999999999")
+    assert res2 == {"reported": False, "note": ""}, f"Lỗi test 2: kết quả {res2}"
+
+    # Test 3: Số có dấu cách, chấm, gạch ngang
+    res3 = check_reported_account(" 0123.456-789 ")
+    assert res3["reported"] is True, f"Lỗi test 3: kết quả {res3}"
+    assert res3["note"] == res1["note"], f"Lỗi test 3: ghi chú không khớp: {res3['note']}"
+
+    # Test 4: File thiếu (không ném lỗi, trả về reported=False)
+    global _REPORTED_ACCOUNTS_CACHE, REPORTED_ACCOUNTS_PATH
+    orig_cache = _REPORTED_ACCOUNTS_CACHE
+    orig_path = REPORTED_ACCOUNTS_PATH
+    try:
+        REPORTED_ACCOUNTS_PATH = Path(__file__).resolve().parent / "non_existent_accounts.json"
+        _REPORTED_ACCOUNTS_CACHE = None
+        res4 = check_reported_account("0123456789")
+        assert res4 == {"reported": False, "note": ""}, f"Lỗi test 4: kết quả {res4}"
+    finally:
+        REPORTED_ACCOUNTS_PATH = orig_path
+        _REPORTED_ACCOUNTS_CACHE = orig_cache
+
+
 if __name__ == "__main__":
+    test_check_reported_account()
+    print("4/4 test check_reported_account passed thành công!")
     samples = json.load(open(Path(__file__).resolve().parents[2] / "data" / "sample_messages.json", encoding="utf-8"))
     for s in samples:
         r = analyze_entities(s["text"])
