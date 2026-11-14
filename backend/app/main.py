@@ -19,13 +19,14 @@ except ImportError:
 
 from . import analyst
 from .entity_intel import INJECTION_PATTERNS, analyze_entities, merge_with_analyst
-from .routers import vision
+from .routers import guard, vision
 
 app = FastAPI(title="AntiScam API")
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
 app.include_router(vision.router)
+app.include_router(guard.router)
 
 
 class AnalyzeRequest(BaseModel):

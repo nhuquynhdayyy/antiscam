@@ -51,7 +51,7 @@ def analyze_with_gemini(text: str, rule_reasons=None, retries: int = 2) -> dict:
             + "\n</tin_hieu_tu_luat>"
         )
 
-    last_err = None
+    last_err: Exception = RuntimeError("Không có model nào khả dụng")
     for model in _models():
         for attempt in range(retries):
             t0 = time.time()
