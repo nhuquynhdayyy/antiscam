@@ -612,6 +612,77 @@ mark {
   background-color: var(--sf);
 }
 
+/* Gợi ý câu trả lời phản biện */
+.replies-box {
+  margin: 14px 0 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.015);
+}
+
+.replies-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--tx);
+  margin-bottom: 4px;
+}
+
+.replies-hint {
+  margin: 0 0 10px;
+  font-size: 0.84rem;
+  color: var(--mu);
+}
+
+.replies-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reply-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  background-color: var(--sf);
+}
+
+.reply-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.reply-label {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+  margin-bottom: 4px;
+}
+
+.reply-text {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--tx);
+}
+
+.reply-copy-btn {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+}
+
 /* Nhóm nút kết quả */
 .result-actions {
   display: flex;

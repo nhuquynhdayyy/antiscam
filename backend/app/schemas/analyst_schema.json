@@ -28,7 +28,18 @@
     "next_likely_step": { "type": "string" },
     "user_advice": { "type": "string" },
     "ask_trusted_circle": { "type": "boolean" },
-    "follow_up_question": { "type": "string" }
+    "follow_up_question": { "type": "string" },
+    "suggested_replies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string" },
+          "text": { "type": "string" }
+        },
+        "required": ["label", "text"]
+      }
+    }
   },
-  "required": ["risk_level", "scam_type", "stage", "tactics", "evidence", "entities", "next_likely_step", "user_advice", "ask_trusted_circle", "follow_up_question"]
+  "required": ["risk_level", "scam_type", "stage", "tactics", "evidence", "entities", "next_likely_step", "user_advice", "ask_trusted_circle", "follow_up_question", "suggested_replies"]
 }

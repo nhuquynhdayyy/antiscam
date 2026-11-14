@@ -44,6 +44,16 @@
         user_advice: "Dừng lại, không chuyển tiền. Công ty thật không thu cọc để nhận việc.",
         ask_trusted_circle: true,
         follow_up_question: "",
+        suggested_replies: [
+          {
+            label: "Hỏi vặn xác minh",
+            text: "Cho tôi xin tên công ty, mã số thuế và hợp đồng lao động có dấu đỏ để tôi kiểm tra trước khi nhận việc nhé."
+          },
+          {
+            label: "Từ chối đóng cọc",
+            text: "Tôi không đóng bất kỳ khoản tiền cọc nào trước khi làm việc. Nếu công ty uy tín thì không thu cọc ứng viên."
+          }
+        ],
         rule_reasons: ["Yêu cầu nạp cọc trước khi nhận việc", "Tạo áp lực thời gian gấp"],
         decided_by: "ai",
         degraded: false
@@ -84,6 +94,16 @@
         user_advice: "Cẩn trọng kiểm tra lại thông tin cơ sở lưu trú qua các kênh chính thống hoặc gọi điện xác nhận trước khi chuyển cọc.",
         ask_trusted_circle: true,
         follow_up_question: "Cơ sở lưu trú có mã số kinh doanh hoặc fanpage tích xanh không?",
+        suggested_replies: [
+          {
+            label: "Xác minh chính chủ",
+            text: "Bạn gửi giúp mình số điện thoại bàn lễ tân và trang Google Maps/fanpage chính thức của homestay để mình gọi xác nhận nhé."
+          },
+          {
+            label: "Từ chối chuyển trước",
+            text: "Mình chỉ đặt phòng qua nền tảng uy tín hoặc thanh toán trực tiếp khi nhận phòng, không chuyển cọc qua link lạ."
+          }
+        ],
         rule_reasons: ["Đường link tên miền lạ chưa xác thực", "Yêu cầu đặt cọc qua mạng"],
         decided_by: "ai",
         degraded: false
@@ -118,6 +138,12 @@
         user_advice: "Không truy cập đường link lạ. Tra cứu phạt nguội trên cổng thông tin chính thức của Cục Cảnh sát giao thông.",
         ask_trusted_circle: true,
         follow_up_question: "",
+        suggested_replies: [
+          {
+            label: "Từ chối giao dịch",
+            text: "Tôi sẽ trực tiếp tra cứu trên cổng thông tin chính thức csgt.vn hoặc liên hệ cơ quan công an địa phương, không bấm vào đường link này."
+          }
+        ],
         rule_reasons: ["Giả mạo cơ quan nhà nước", "Tên miền không thuộc gov.vn"],
         decided_by: "rules",
         degraded: true
@@ -558,6 +584,87 @@
       box.append(adviceBox);
     }
 
+    // 8b. Gợi ý câu trả lời phản biện (Reply Assistant)
+    const replies = Array.isArray(data.suggested_replies)
+      ? data.suggested_replies.filter((item) => item && item.text)
+      : [];
+    if (replies.length > 0 && data.risk_level !== "safe") {
+      const repliesBox = document.createElement("div");
+      repliesBox.className = "replies-box";
+
+      const repliesTitle = document.createElement("div");
+      repliesTitle.className = "replies-title";
+      repliesTitle.append(
+        createSvg(18, 18, "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"),
+        document.createTextNode(" Gợi ý câu trả lời phản biện")
+      );
+
+      const repliesHint = document.createElement("p");
+      repliesHint.className = "replies-hint";
+      repliesHint.textContent = "Chọn một câu mẫu để sao chép và gửi lại nhằm kiểm chứng hoặc từ chối an toàn:";
+
+      const repliesList = document.createElement("div");
+      repliesList.className = "replies-list";
+
+      replies.forEach(function (item) {
+        const row = document.createElement("div");
+        row.className = "reply-item";
+
+        const contentCol = document.createElement("div");
+        contentCol.className = "reply-content";
+
+        if (item.label) {
+          const labelEl = document.createElement("span");
+          labelEl.className = "reply-label";
+          labelEl.textContent = item.label;
+          contentCol.appendChild(labelEl);
+        }
+
+        const textEl = document.createElement("p");
+        textEl.className = "reply-text";
+        textEl.textContent = item.text;
+        contentCol.appendChild(textEl);
+
+        const copyBtn = document.createElement("button");
+        copyBtn.type = "button";
+        copyBtn.className = "btn reply-copy-btn";
+        copyBtn.textContent = "Sao chép";
+        copyBtn.onclick = async function () {
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(item.text);
+            } else {
+              const ta = document.createElement("textarea");
+              ta.value = item.text;
+              ta.style.position = "fixed";
+              ta.style.top = "-9999px";
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand("copy");
+              document.body.removeChild(ta);
+            }
+            copyBtn.textContent = "Đã chép";
+            setTimeout(function () {
+              copyBtn.textContent = "Sao chép";
+            }, 1500);
+            if (window.AntiScam && typeof window.AntiScam.showToast === "function") {
+              window.AntiScam.showToast("Đã sao chép câu trả lời");
+            }
+          } catch (err) {
+            if (window.AntiScam && typeof window.AntiScam.showToast === "function") {
+              window.AntiScam.showToast("Không thể sao chép tự động");
+            }
+          }
+        };
+
+        row.append(contentCol, copyBtn);
+        repliesList.appendChild(row);
+      });
+
+      repliesBox.append(repliesTitle, repliesHint, repliesList);
+      box.append(repliesBox);
+    }
+
     // 9. Nút #share-btn và nút "Kiểm tra tin khác"
     const actionsRow = document.createElement("div");
     actionsRow.className = "result-actions";
@@ -716,7 +823,13 @@
     }, 20000);
 
     try {
-      const response = await fetch("/analyze", {
+      const apiBase =
+        window.ANTISCAM_API_BASE ||
+        ((location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "[::1]") &&
+        location.port !== "8080"
+          ? `http://${location.hostname}:8080`
+          : "");
+      const response = await fetch(`${apiBase}/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: text }),
